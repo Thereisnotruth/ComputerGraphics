@@ -75,6 +75,38 @@ function main() {
         baseDisc.add(baseDiscMesh.mesh);
     }
     
+    // baseJoint
+    const baseJoint = new THREE.Object3D();
+    {
+        baseJoint.angle = 0;
+        baseDisc.add(baseJoint);
+    }
+
+    // baseJointMesh
+    const baseJointMesh = {radius: 0.5, height: 0.5, color: 'green', segs:8};
+    {
+        baseJointMesh.mesh = new THREE.Mesh(
+                                new THREE.CylinderBufferGeometry(baseJointMesh.radius,
+                                    baseJointMesh.radius, baseJointMesh.height, baseJointMesh.segs),
+                                new THREE.MeshPhongMaterial({color: baseJointMesh.color}));
+        baseJoint.add(baseJointMesh.mesh);
+    }
+
+    // lower arm
+    const lowerArm = new THREE.Object3D();
+    {
+        // base.add(lowerArm);
+    }
+
+    const lowerArmMesh = {radius: 0.3, height: 3, color:'blue', segs:8};
+    {
+        lowerArmMesh.mesh = new THREE.Mesh(
+                                    new THREE.CylinderBufferGeometry(lowerArmMesh.radius,
+                                        lowerArmMesh.radius, lowerArmMesh.height, lowerArmMesh.segs),
+                                    new THREE.MeshPhongMaterial({color: lowerArmMesh.color}));
+        lowerArm.add(lowerArmMesh.mesh);
+    }
+    
  
     function updateLuxo() {
         base.position.y = baseMesh.height/2;
@@ -84,6 +116,9 @@ function main() {
         baseDisc.rotation.y = THREE.MathUtils.degToRad(baseDisc.angle);
         baseDiscMesh.mesh.position.y = baseDiscMesh.height/2;
 
+        baseJoint.rotation.x = THREE.MathUtils.degToRad(90);
+        baseJoint.rotation.y = THREE.MathUtils.degToRad(baseJoint.angle);
+        baseJoint.position.y = baseMesh.height/2 + baseDiscMesh.height - 0.5;
     }
 
     updateLuxo();
@@ -98,7 +133,10 @@ function main() {
         folder.open();
 
         gui.add(baseDisc, 'angle', 0, 360, 1).name('angle (yellow)').onChange(updateLuxo);
-
+        
+        folder = gui.addFolder('joint (green) angles');
+        folder.add(baseJoint, 'angle', -180, 180, 1).name('base').onChange(updateLuxo);
+        folder.open();
     }
 
 
