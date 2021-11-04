@@ -27,6 +27,7 @@ import {GUI} from '../3rdparty/dat.gui.module.js';
 function main() {
     const canvas = document.querySelector('#webgl');
     const renderer = new THREE.WebGLRenderer({canvas});
+    renderer.shadowMap.enabled = true;
    
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('black');
@@ -39,7 +40,22 @@ function main() {
         cubeMat.side = THREE.BackSide;
         const mesh = new THREE.Mesh(cubeGeo, cubeMat);
         mesh.position.set(0, room.height / 2, 0);
+        mesh.receiveShadow = true;
         scene.add(mesh);
+    }
+
+    const test = new THREE.Object3D();
+    {
+        scene.add(test);
+    }
+
+    const testMesh = {width:4, height:1, color: 'white'};
+    {
+        testMesh.mesh = new THREE.Mesh(new THREE.BoxBufferGeometry(1, 1, 1),
+                                    new THREE.MeshPhongMaterial({color: testMesh.color}));
+        testMesh.mesh.receiveShadow = true;
+        testMesh.mesh.castShadow = true;
+        test.add(testMesh.mesh);
     }
 
     // define the luxo lamp
@@ -194,11 +210,12 @@ function main() {
     const spotLight = {color: 'white', intensity: 1};
     {
         spotLight.light = new THREE.SpotLight(spotLight.color, spotLight.intensity);
+        spotLight.light.castShadow = true;
         spotLight.light.target = lightBulb;
         spotLight.light.angle = THREE.MathUtils.degToRad(30);
-        spotLight.helper = new THREE.SpotLightHelper(spotLight.light)
+        spotLight.helper = new THREE.SpotLightHelper(spotLight.light);
+        spotLight.toggleHelper = false;
         lightBulb.add(spotLight.light);
-        scene.add(spotLight.helper);
     }
 
     class DegRadHelper {
@@ -214,7 +231,18 @@ function main() {
         }
     }
 
+    function lightHelper() {
+        if (spotLight.toggleHelper) {
+            scene.add(spotLight.helper);
+        } else {
+            scene.remove(spotLight.helper);
+        }
+    }
+
     function updateLuxo() {
+        test.position.y = 3;
+        test.position.x = 10;
+
         base.position.y = baseMesh.height/2;
         baseMesh.mesh.scale.set(baseMesh.width, baseMesh.height, baseMesh.width);
 
@@ -248,7 +276,10 @@ function main() {
         lightBulb.position.y = headMesh.height + lightBulbMesh.radius;
         lightBulbMesh.mesh.position.y = lightBulbMesh.radius;
         lightBulb.rotation.z = THREE.MathUtils.degToRad(180);
-        spotLight.helper.update();
+
+        if (spotLight.toggleHelper) {
+            spotLight.helper.update();
+        }
     }
 
     updateLuxo();
@@ -277,6 +308,7 @@ function main() {
 
         folder = gui.addFolder('light bulb');
         folder.add(new DegRadHelper(spotLight.light, 'angle'), 'value', 10, 90, 1).name('angle').onChange(updateLuxo);
+        folder.add(spotLight, 'toggleHelper').name('show helper').onChange(lightHelper);
         folder.open();
 
     }
@@ -287,6 +319,7 @@ function main() {
         const intensity = 0.5;
         const light = new THREE.PointLight(color, intensity);
         light.position.set(0, room.height, 0);
+        light.castShadow = true;
         scene.add(light);
         
         const helper = new THREE.PointLightHelper(light);
