@@ -44,20 +44,6 @@ function main() {
         scene.add(mesh);
     }
 
-    const test = new THREE.Object3D();
-    {
-        scene.add(test);
-    }
-
-    const testMesh = {width:4, height:1, color: 'white'};
-    {
-        testMesh.mesh = new THREE.Mesh(new THREE.BoxBufferGeometry(1, 1, 1),
-                                    new THREE.MeshPhongMaterial({color: testMesh.color}));
-        testMesh.mesh.receiveShadow = true;
-        testMesh.mesh.castShadow = true;
-        test.add(testMesh.mesh);
-    }
-
     // define the luxo lamp
 
     // base
@@ -190,7 +176,7 @@ function main() {
         head.add(headMesh.mesh);
     }
 
-    // lightBuld
+    // lightBulb
     const lightBulb = new THREE.Object3D();
     {
         head.add(lightBulb);
@@ -218,6 +204,7 @@ function main() {
         lightBulb.add(spotLight.light);
     }
 
+    // DegRadHelper
     class DegRadHelper {
         constructor(obj, prop) {
             this.obj = obj;
@@ -231,6 +218,7 @@ function main() {
         }
     }
 
+    // lightHelper;
     function lightHelper() {
         if (spotLight.toggleHelper) {
             scene.add(spotLight.helper);
@@ -239,10 +227,218 @@ function main() {
         }
     }
 
-    function updateLuxo() {
-        test.position.y = 3;
-        test.position.x = 10;
+    // 3D Models
 
+    // Baymax
+    const Baymax = new THREE.Object3D();
+    {
+        scene.add(Baymax)
+    }
+
+    // BaymaxHead
+    const BaymaxHead = new THREE.Object3D();
+    {
+        Baymax.add(BaymaxHead);
+    }
+    
+    // BaymaxHeadMesh
+    const BaymaxHeadMesh = {radius: 1, color: 'white', segs: 32};
+    {
+        BaymaxHeadMesh.mesh = new THREE.Mesh(
+                                new THREE.SphereBufferGeometry(
+                                    BaymaxHeadMesh.radius,
+                                    BaymaxHeadMesh.segs,
+                                    BaymaxHeadMesh.segs
+                                ),
+                                new THREE.MeshPhongMaterial({color: BaymaxHeadMesh.color}));
+        BaymaxHeadMesh.mesh.receiveShadow = true;
+        BaymaxHeadMesh.mesh.castShadow = true;
+        BaymaxHead.add(BaymaxHeadMesh.mesh);
+    }
+
+    // BaymaxFace
+    const BaymaxFace = new THREE.Object3D();
+    {
+        BaymaxHead.add(BaymaxFace);
+    }
+
+    // BaymaxEye
+    const BaymaxEyeMesh = {radius: 0.2, height: 0.1, color: 'black', segs: 50};
+    {
+        BaymaxEyeMesh.meshL = new THREE.Mesh(
+                                new THREE.CylinderBufferGeometry(
+                                    BaymaxEyeMesh.radius, BaymaxEyeMesh.radius,
+                                    BaymaxEyeMesh.height, BaymaxEyeMesh.segs),
+                                new THREE.MeshPhongMaterial({color: BaymaxEyeMesh.color}));
+        BaymaxEyeMesh.meshR = new THREE.Mesh(
+                                new THREE.CylinderBufferGeometry(
+                                    BaymaxEyeMesh.radius, BaymaxEyeMesh.radius,
+                                    BaymaxEyeMesh.height, BaymaxEyeMesh.segs),
+                                new THREE.MeshPhongMaterial({color: BaymaxEyeMesh.color}));
+        BaymaxFace.add(BaymaxEyeMesh.meshL);
+        BaymaxFace.add(BaymaxEyeMesh.meshR);
+    }
+
+    // BaymaxMouth
+    const BaymaxMouthMesh = {width: 1.4, height: 0.1, depth: 0.1, color: 'black'};
+    {
+        BaymaxMouthMesh.mesh = new THREE.Mesh(
+                                new THREE.BoxBufferGeometry(
+                                        BaymaxMouthMesh.width,
+                                        BaymaxMouthMesh.height,
+                                        BaymaxMouthMesh.depth
+                                ),
+                                new THREE.MeshPhongMaterial({color: BaymaxMouthMesh.color}));
+        BaymaxFace.add(BaymaxMouthMesh.mesh);
+    }
+
+    // BaymaxBody
+    const BaymaxBody = new THREE.Object3D();
+    {
+        Baymax.add(BaymaxBody);
+    }
+
+    const BaymaxBodyMesh = {radius: 5, color: 'white', segs: 32};
+    {
+        let points = [];
+        for (let deg = 0; deg <= 180; deg += 6 ) {
+
+            let rad = Math.PI * deg / 180;
+            let point = new THREE.Vector2( ( 0.72 + 0.08 * Math.cos( rad ) ) * Math.sin( rad ), - Math.cos( rad ) ); // the "egg equation"
+            //console.log( point ); // x-coord should be greater than zero to avoid degenerate triangles; it is not in this formula.
+            
+            point.x *= 5.5;
+            point.y *= 5;
+            points.push( point );
+
+        }
+        BaymaxBodyMesh.mesh = new THREE.Mesh(
+                            new THREE.LatheBufferGeometry(
+                                points,
+                                BaymaxBodyMesh.segs
+                            ),
+                            new THREE.MeshPhongMaterial(
+                                {
+                                    color: BaymaxBodyMesh.color
+                                }
+                            )
+        );
+        BaymaxBodyMesh.mesh.receiveShadow = true;
+        BaymaxBodyMesh.mesh.castShadow = true;
+        BaymaxBody.add(BaymaxBodyMesh.mesh);
+    }
+
+    // BaymaxChest
+    const BaymaxChestMesh = {radius: 0.4, height: 0.1, color: 'white', segs: 50};
+    {
+        BaymaxChestMesh.mesh = new THREE.Mesh(
+                                new THREE.CylinderBufferGeometry(
+                                    BaymaxChestMesh.radius, BaymaxChestMesh.radius,
+                                    BaymaxChestMesh.height, BaymaxChestMesh.segs),
+                                new THREE.MeshPhongMaterial({color: BaymaxChestMesh.color}));
+        BaymaxBody.add(BaymaxChestMesh.mesh);
+    }
+
+    // BaymaxLegs
+    const BaymaxLegs = new THREE.Object3D();
+    {
+        BaymaxBody.add(BaymaxLegs);
+    }
+
+    // BaymaxLegsMesh
+    const BaymaxLegsMesh = {color: 'white', segs: 32};
+    {
+        let points = [];
+        for (let deg = 0; deg <= 180; deg += 6 ) {
+
+            let rad = Math.PI * deg / 180;
+            let point = new THREE.Vector2( ( 0.72 + 0.08 * Math.cos( rad ) ) * Math.sin( rad ), - Math.cos( rad ) ); // the "egg equation"
+            point.x *= 2;
+            point.y *= 2;
+            points.push( point );
+
+        }
+        BaymaxLegsMesh.meshL = new THREE.Mesh(
+                            new THREE.LatheBufferGeometry(
+                                points,
+                                BaymaxLegsMesh.segs
+                            ),
+                            new THREE.MeshPhongMaterial(
+                                {
+                                    color: BaymaxLegsMesh.color
+                                }
+                            )
+        );
+        BaymaxLegsMesh.meshL.receiveShadow = true;
+        BaymaxLegsMesh.meshL.castShadow = true;
+        BaymaxLegsMesh.meshR = new THREE.Mesh(
+                            new THREE.LatheBufferGeometry(
+                                points,
+                                BaymaxLegsMesh.segs
+                            ),
+                            new THREE.MeshPhongMaterial(
+                                {
+                                    color: BaymaxLegsMesh.color
+                                }
+                            )
+        );
+        BaymaxLegsMesh.meshR.receiveShadow = true;
+        BaymaxLegsMesh.meshR.castShadow = true;
+        BaymaxLegs.add(BaymaxLegsMesh.meshL);
+        BaymaxLegs.add(BaymaxLegsMesh.meshR);
+    }
+
+    // BaymaxArms
+    const BaymaxArms = new THREE.Object3D();
+    {
+        BaymaxBody.add(BaymaxArms);
+    }
+
+    // BaymaxArmsMesh
+    const BaymaxArmsMesh = {color: 'white', segs: 32};
+    {
+        let points = [];
+        for (let deg = 0; deg <= 180; deg += 6 ) {
+
+            let rad = Math.PI * deg / 180;
+            let point = new THREE.Vector2( ( 0.72 + 0.08 * Math.cos( rad ) ) * Math.sin( rad ), - Math.cos( rad ) ); // the "egg equation"
+            point.x *= 2.5;
+            point.y *= 4;
+            points.push( point );
+
+        }
+        BaymaxArmsMesh.meshL = new THREE.Mesh(
+                            new THREE.LatheBufferGeometry(
+                                points,
+                                BaymaxBodyMesh.segs
+                            ),
+                            new THREE.MeshPhongMaterial(
+                                {
+                                    color: BaymaxArmsMesh.color
+                                }
+                            )
+        );
+        BaymaxArmsMesh.meshL.receiveShadow = true;
+        BaymaxArmsMesh.meshL.castShadow = true;
+        BaymaxArmsMesh.meshR = new THREE.Mesh(
+                            new THREE.LatheBufferGeometry(
+                                points,
+                                BaymaxArmsMesh.segs
+                            ),
+                            new THREE.MeshPhongMaterial(
+                                {
+                                    color: BaymaxArmsMesh.color
+                                }
+                            )
+        );
+        BaymaxArmsMesh.meshR.receiveShadow = true;
+        BaymaxArmsMesh.meshR.castShadow = true;
+        BaymaxArms.add(BaymaxArmsMesh.meshL);
+        BaymaxArms.add(BaymaxArmsMesh.meshR);
+    }
+
+
+    function updateLuxo() {
         base.position.y = baseMesh.height/2;
         baseMesh.mesh.scale.set(baseMesh.width, baseMesh.height, baseMesh.width);
 
@@ -280,6 +476,42 @@ function main() {
         if (spotLight.toggleHelper) {
             spotLight.helper.update();
         }
+
+        Baymax.position.y = 7;
+        Baymax.position.x = 10;
+
+        BaymaxHead.position.y = BaymaxBodyMesh.radius + 0.8;
+        BaymaxHeadMesh.mesh.scale.set(1, 1, 1.5);
+
+        BaymaxFace.position.x = -0.95;
+        BaymaxFace.rotation.z = THREE.MathUtils.degToRad(90);
+
+        BaymaxEyeMesh.meshL.position.z = -0.7;
+        BaymaxEyeMesh.meshR.position.z = 0.7;
+        BaymaxEyeMesh.meshR.rotation.x = THREE.MathUtils.degToRad(20);
+        BaymaxEyeMesh.meshL.rotation.x = THREE.MathUtils.degToRad(-20);
+        
+        BaymaxMouthMesh.mesh.rotation.x = THREE.MathUtils.degToRad(90);
+        BaymaxMouthMesh.mesh.rotation.z = THREE.MathUtils.degToRad(90);
+
+        BaymaxChestMesh.mesh.position.x = -1.8;
+        BaymaxChestMesh.mesh.rotation.z = THREE.MathUtils.degToRad(40);
+        BaymaxChestMesh.mesh.rotation.x = THREE.MathUtils.degToRad(35);
+        BaymaxChestMesh.mesh.position.y = 3.8;
+        BaymaxChestMesh.mesh.position.z = 1.5;
+
+        BaymaxLegs.position.y = -(BaymaxBodyMesh.radius + 0.6);
+        BaymaxLegsMesh.meshL.rotation.x = THREE.MathUtils.degToRad(-20);
+        BaymaxLegsMesh.meshL.rotation.z = THREE.MathUtils.degToRad(180);
+        BaymaxLegsMesh.meshR.rotation.x = THREE.MathUtils.degToRad(20);
+        BaymaxLegsMesh.meshR.rotation.z = THREE.MathUtils.degToRad(180);
+        BaymaxLegsMesh.meshL.position.z = -1.3;
+        BaymaxLegsMesh.meshR.position.z = 1.3;
+
+        BaymaxArmsMesh.meshL.position.z = -3;
+        BaymaxArmsMesh.meshR.position.z = 3;
+        BaymaxArmsMesh.meshL.rotation.x = THREE.MathUtils.degToRad(20);
+        BaymaxArmsMesh.meshR.rotation.x = THREE.MathUtils.degToRad(-20);
     }
 
     updateLuxo();
