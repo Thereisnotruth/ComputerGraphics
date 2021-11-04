@@ -92,7 +92,7 @@ function main() {
         baseJoint.add(baseJointMesh.mesh);
     }
 
-    // lowrArm
+    // lowerArm
     const lowerArm = new THREE.Object3D();
     {
         baseJoint.add(lowerArm);
@@ -125,10 +125,98 @@ function main() {
         middleJoint.add(middleJointMesh.mesh);
     }
 
+    // upperArm
+    const upperArm = new THREE.Object3D();
+    {
+        middleJoint.add(upperArm);
+    }
+
+    // upperArmMesh
+    const upperArmMesh = {radius: 0.3, height: 5, color: 'blue', segs: 32};
+    {
+        upperArmMesh.mesh = new THREE.Mesh(
+                                new THREE.CylinderBufferGeometry(upperArmMesh.radius,
+                                    upperArmMesh.radius, 1, upperArmMesh.segs),
+                                new THREE.MeshPhongMaterial({color: upperArmMesh.color}));
+        upperArm.add(upperArmMesh.mesh);
+    }
+
+    // headJoint
+    const headJoint = new THREE.Object3D();
+    {
+        headJoint.angle = 30;
+        upperArm.add(headJoint);
+    }
+
+    // headJointMesh
+    const headJointMesh = {radius: 0.5, height: 1, color: 'green', segs: 8};
+    {
+        headJointMesh.mesh = new THREE.Mesh(
+                                new THREE.CylinderBufferGeometry(headJointMesh.radius,
+                                    headJointMesh.radius, headJointMesh.height, headJointMesh.segs),
+                                new THREE.MeshPhongMaterial({color: headJointMesh.color}));
+        headJoint.add(headJointMesh.mesh);
+    }
+
+    // head
+    const head = new THREE.Object3D();
+    {
+        headJoint.add(head);
+    }
+    
+    // headMesh
+    const headMesh = {radius1: 2.5, radius2: 1, height: 2.5, color: 'gray', segs: 32};
+    {
+        headMesh.mesh = new THREE.Mesh(
+                            new THREE.CylinderBufferGeometry(headMesh.radius1,
+                                headMesh.radius2, headMesh.height, headMesh.segs),
+                            new THREE.MeshPhongMaterial({color: headMesh.color}));
+        head.add(headMesh.mesh);
+    }
+
+    // lightBuld
+    const lightBulb = new THREE.Object3D();
+    {
+        head.add(lightBulb);
+    }
+
+    // lightBulbMesh
+    const lightBulbMesh = {radius: 1, color: 'white', widthSegs: 32, heightSegs: 32};
+    {
+        lightBulbMesh.mesh = new THREE.Mesh(
+                            new THREE.SphereBufferGeometry(lightBulbMesh.radius,
+                                lightBulbMesh.widthSegs, lightBulbMesh.heightSegs),
+                            new THREE.MeshPhongMaterial({color: lightBulbMesh.color}));
+        lightBulb.add(lightBulbMesh.mesh);
+    }
+
+    // spotLight
+    const spotLight = {color: 'white', intensity: 1};
+    {
+        spotLight.light = new THREE.SpotLight(spotLight.color, spotLight.intensity);
+        spotLight.light.target = lightBulb;
+        spotLight.light.angle = THREE.MathUtils.degToRad(30);
+        spotLight.helper = new THREE.SpotLightHelper(spotLight.light)
+        lightBulb.add(spotLight.light);
+        scene.add(spotLight.helper);
+    }
+
+    class DegRadHelper {
+        constructor(obj, prop) {
+            this.obj = obj;
+            this.prop = prop;
+        }
+        get value() {
+            return THREE.MathUtils.radToDeg(this.obj[this.prop]);
+        }
+        set value(v) {
+            this.obj[this.prop] = THREE.MathUtils.degToRad(v);
+        }
+    }
+
     function updateLuxo() {
         base.position.y = baseMesh.height/2;
         baseMesh.mesh.scale.set(baseMesh.width, baseMesh.height, baseMesh.width);
-        console.log(baseMesh.height);
 
         baseDisc.position.y = baseMesh.height/2 + baseDiscMesh.height/2;
         baseDisc.rotation.y = THREE.MathUtils.degToRad(baseDisc.angle);
@@ -143,6 +231,24 @@ function main() {
 
         middleJoint.position.y = lowerArmMesh.height;
         middleJoint.rotation.x = THREE.MathUtils.degToRad(90);
+        middleJoint.rotation.y = THREE.MathUtils.degToRad(middleJoint.angle);
+
+        upperArm.rotation.x = THREE.MathUtils.degToRad(-90);
+        upperArmMesh.mesh.scale.set(1, upperArmMesh.height, 1);
+        upperArmMesh.mesh.position.y = upperArmMesh.height/2;
+
+        headJoint.position.y = upperArmMesh.height;
+        headJoint.rotation.x = THREE.MathUtils.degToRad(90);
+        headJoint.rotation.y = THREE.MathUtils.degToRad(headJoint.angle);
+
+        head.rotation.x = THREE.MathUtils.degToRad(90);
+        head.rotation.z = THREE.MathUtils.degToRad(90);
+        headMesh.mesh.position.y = headMesh.height/2;
+
+        lightBulb.position.y = headMesh.height + lightBulbMesh.radius;
+        lightBulbMesh.mesh.position.y = lightBulbMesh.radius;
+        lightBulb.rotation.z = THREE.MathUtils.degToRad(180);
+        spotLight.helper.update();
     }
 
     updateLuxo();
@@ -160,10 +266,17 @@ function main() {
 
         folder = gui.addFolder('arm (blue) lengths');
         folder.add(lowerArmMesh, 'height', 2, 7, 0.1).name('lower').onChange(updateLuxo);
+        folder.add(upperArmMesh, 'height', 2, 7, 0.1).name('upper').onChange(updateLuxo);
         folder.open();
 
         folder = gui.addFolder('joint (green) angles');
         folder.add(baseJoint, 'angle', -180, 180, 1).name('base').onChange(updateLuxo);
+        folder.add(middleJoint, 'angle', -180, 180, 1).name('middle').onChange(updateLuxo);
+        folder.add(headJoint, 'angle', -180, 180, 1).name('head').onChange(updateLuxo);
+        folder.open();
+
+        folder = gui.addFolder('light bulb');
+        folder.add(new DegRadHelper(spotLight.light, 'angle'), 'value', 10, 90, 1).name('angle').onChange(updateLuxo);
         folder.open();
 
     }
