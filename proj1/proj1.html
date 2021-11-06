@@ -376,6 +376,7 @@ function main() {
     function lightHelper() {
         if (spotLight.toggleHelper) {
             scene.add(spotLight.helper);
+            updateLuxo();
         } else {
             scene.remove(spotLight.helper);
         }
@@ -915,7 +916,6 @@ function main() {
         folder.add(new DegRadHelper(spotLight.light, 'angle'), 'value', 10, 90, 1).name('angle').onChange(updateLuxo);
         folder.add(spotLight, 'toggleHelper').name('show helper').onChange(lightHelper);
         folder.open();
-
     }
 
 
