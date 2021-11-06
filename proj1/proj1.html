@@ -421,20 +421,212 @@ function main() {
         BaymaxArmsMesh.meshL.receiveShadow = true;
         BaymaxArmsMesh.meshL.castShadow = true;
         BaymaxArmsMesh.meshR = new THREE.Mesh(
-                            new THREE.LatheBufferGeometry(
-                                points,
-                                BaymaxArmsMesh.segs
-                            ),
-                            new THREE.MeshPhongMaterial(
-                                {
-                                    color: BaymaxArmsMesh.color
-                                }
-                            )
+            new THREE.LatheBufferGeometry(
+                points,
+                BaymaxArmsMesh.segs
+            ),
+            new THREE.MeshPhongMaterial(
+                {
+                    color: BaymaxArmsMesh.color
+                }
+            )
         );
         BaymaxArmsMesh.meshR.receiveShadow = true;
         BaymaxArmsMesh.meshR.castShadow = true;
         BaymaxArms.add(BaymaxArmsMesh.meshL);
         BaymaxArms.add(BaymaxArmsMesh.meshR);
+    }
+
+    // torusKnot
+    const torusKnot = new THREE.Object3D();
+    {
+        scene.add(torusKnot);
+    }
+
+    // torusKnotMesh
+    const torusKnotMesh = {radius: 2.5, tubeRadius: 1.5, raSegs: 30, tubSegs: 100, p: 2, q: 3, color: 'red'};
+    {
+        torusKnotMesh.mesh = new THREE.Mesh(
+            new THREE.TorusKnotBufferGeometry(
+                torusKnotMesh.radius,
+                torusKnotMesh.tubeRadius,
+                torusKnotMesh.raSegs,
+                torusKnotMesh.tubSegs,
+                torusKnotMesh.p,
+                torusKnotMesh.q
+            ),
+            new THREE.MeshPhongMaterial(
+                {
+                    color: torusKnotMesh.color
+                }
+            )
+        );
+        torusKnotMesh.mesh.receiveShadow = true;
+        torusKnotMesh.mesh.castShadow = true;
+        torusKnot.add(torusKnotMesh.mesh);
+    }
+
+    // heart
+    const heart = new THREE.Object3D();
+    {
+        scene.add(heart);
+    }
+
+    // heartMesh
+    const heartMesh = {color: 'pink'};
+    {
+        const shape = new THREE.Shape();
+        const x = -2.5;
+        const y = -5;
+        shape.moveTo(x + 2.5, y + 2.5);
+        shape.bezierCurveTo(x + 2.5, y + 2.5, x + 2, y, x, y);
+        shape.bezierCurveTo(x - 3, y, x - 3, y + 3.5, x - 3, y + 3.5);
+        shape.bezierCurveTo(x - 3, y + 5.5, x - 1.5, y + 7.7, x + 2.5, y + 9.5);
+        shape.bezierCurveTo(x + 6, y + 7.7, x + 8, y + 4.5, x + 8, y + 3.5);
+        shape.bezierCurveTo(x + 8, y + 3.5, x + 8, y, x + 5, y);
+        shape.bezierCurveTo(x + 3.5, y, x + 2.5, y + 2.5, x + 2.5, y + 2.5);
+
+        const extrudeSettings = {
+            steps: 2,  
+            depth: 2,  
+            bevelEnabled: true,  
+            bevelThickness: 1,  
+            bevelSize: 1,  
+            bevelSegments: 2,  
+        };
+        heartMesh.mesh = new THREE.Mesh(
+            new THREE.ExtrudeBufferGeometry(shape, extrudeSettings),
+            new THREE.MeshPhongMaterial(
+                {
+                    color: heartMesh.color
+                }
+            )
+        );
+        heartMesh.mesh.receiveShadow = true;
+        heartMesh.mesh.castShadow = true;
+        heart.add(heartMesh.mesh);
+    }
+
+    // car
+    const car = new THREE.Object3D();
+    {
+        scene.add(car);
+    }
+
+    // carMesh
+    const carMesh = {frameWidth: 11, frameHeight: 2, frameDepth: 6, frameColor: 'blue', wheelColor: 'black'};
+    {
+        const shape = new THREE.Shape();
+        shape.moveTo(1, 1);
+        shape.bezierCurveTo(0, 0, 0.3, 0.3, 0, 0);
+
+        const extrudeSettings = {
+            steps: 1,  
+            depth: 4,  
+            bevelEnabled: true,  
+            bevelThickness: 1,  
+            bevelSize: 2,  
+            bevelSegments: 32,
+        };
+        
+        // upperFrame
+        carMesh.mesh1 = new THREE.Mesh(
+            new THREE.ExtrudeGeometry(shape, extrudeSettings),
+            new THREE.MeshPhongMaterial(
+                {
+                    color: carMesh.frameColor
+                }
+            )
+        );
+        carMesh.mesh1.rotation.z = THREE.MathUtils.degToRad(-45);
+        carMesh.mesh1.position.set(0, 1, -2);
+        carMesh.mesh1.receiveShadow = true;
+        carMesh.mesh1.castShadow = true;
+        
+        // lowerFrame
+        carMesh.mesh2 = new THREE.Mesh(
+            new THREE.BoxBufferGeometry(
+                carMesh.frameWidth, carMesh.frameHeight, carMesh.frameDepth
+            ),
+            new THREE.MeshPhongMaterial(
+                {
+                    color: carMesh.frameColor
+                }
+            )
+        );
+        carMesh.mesh2.receiveShadow = true;
+        carMesh.mesh2.castShadow = true;
+        
+        // wheel1
+        carMesh.mesh3 = new THREE.Mesh(
+            new THREE.CylinderBufferGeometry(
+                1, 1, 1, 50
+            ),
+            new THREE.MeshPhongMaterial(
+                {
+                    color: carMesh.wheelColor
+                }
+            )
+        )
+        carMesh.mesh3.rotation.x = THREE.MathUtils.degToRad(90);
+        carMesh.mesh3.position.set(3, -1, 2.51);
+        carMesh.mesh3.receiveShadow = true;
+        carMesh.mesh3.castShadow = true;
+
+        // wheel2
+        carMesh.mesh4 = new THREE.Mesh(
+            new THREE.CylinderBufferGeometry(
+                1, 1, 1, 50
+            ),
+            new THREE.MeshPhongMaterial(
+                {
+                    color: carMesh.wheelColor
+                }
+            )
+        )
+        carMesh.mesh4.rotation.x = THREE.MathUtils.degToRad(90);
+        carMesh.mesh4.position.set(3, -1, -2.51);
+        carMesh.mesh4.receiveShadow = true;
+        carMesh.mesh4.castShadow = true;
+
+        // wheel3
+        carMesh.mesh5 = new THREE.Mesh(
+            new THREE.CylinderBufferGeometry(
+                1, 1, 1, 50
+            ),
+            new THREE.MeshPhongMaterial(
+                {
+                    color: carMesh.wheelColor
+                }
+            )
+        )
+        carMesh.mesh5.rotation.x = THREE.MathUtils.degToRad(90);
+        carMesh.mesh5.position.set(-3, -1, -2.51);
+        carMesh.mesh5.receiveShadow = true;
+        carMesh.mesh5.castShadow = true;
+
+        // wheel4
+        carMesh.mesh6 = new THREE.Mesh(
+            new THREE.CylinderBufferGeometry(
+                1, 1, 1, 50
+            ),
+            new THREE.MeshPhongMaterial(
+                {
+                    color: carMesh.wheelColor
+                }
+            )
+        )
+        carMesh.mesh6.rotation.x = THREE.MathUtils.degToRad(90);
+        carMesh.mesh6.position.set(-3, -1, 2.51);
+        carMesh.mesh6.receiveShadow = true;
+        carMesh.mesh6.castShadow = true;
+
+        car.add(carMesh.mesh1);
+        car.add(carMesh.mesh2);
+        car.add(carMesh.mesh3);
+        car.add(carMesh.mesh4);
+        car.add(carMesh.mesh5);
+        car.add(carMesh.mesh6);
     }
 
 
@@ -479,6 +671,8 @@ function main() {
 
         Baymax.position.y = 7;
         Baymax.position.x = 10;
+        Baymax.position.z = -10;
+        Baymax.rotation.y = THREE.MathUtils.degToRad(90);
 
         BaymaxHead.position.y = BaymaxBodyMesh.radius + 0.8;
         BaymaxHeadMesh.mesh.scale.set(1, 1, 1.5);
@@ -512,6 +706,17 @@ function main() {
         BaymaxArmsMesh.meshR.position.z = 3;
         BaymaxArmsMesh.meshL.rotation.x = THREE.MathUtils.degToRad(20);
         BaymaxArmsMesh.meshR.rotation.x = THREE.MathUtils.degToRad(-20);
+
+        torusKnot.position.y = 6;
+        torusKnot.position.x = -10;
+        torusKnot.position.z = -10;
+
+        heart.position.set(-8, 4, 10);
+        heart.rotation.z = THREE.MathUtils.degToRad(180);
+        heart.rotation.y = THREE.MathUtils.degToRad(150);
+        heartMesh.mesh.scale.set(0.5, 0.5, 0.5);
+
+        car.position.set(7, 2, 10);
     }
 
     updateLuxo();
